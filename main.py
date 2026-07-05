@@ -10,6 +10,7 @@ SERIES_DATABASE = [
         "genre": "Action / Horror", 
         "year": 2024, 
         "poster": "https://unsplash.com",
+        "preview_url": "https://googleapis.com",
         "seasons": [
             {
                 "season_number": 1,
@@ -26,6 +27,7 @@ SERIES_DATABASE = [
         "genre": "Sci-Fi / Action", 
         "year": 2022, 
         "poster": "https://unsplash.com",
+        "preview_url": "https://googleapis.com",
         "seasons": [
             {
                 "season_number": 1,
@@ -41,6 +43,7 @@ SERIES_DATABASE = [
         "genre": "Sci-Fi / Adventure", 
         "year": 2011, 
         "poster": "https://unsplash.com",
+        "preview_url": "https://googleapis.com",
         "seasons": [
             {
                 "season_number": 1,
@@ -56,6 +59,7 @@ SERIES_DATABASE = [
         "genre": "Crime / Drama", 
         "year": 2025, 
         "poster": "https://unsplash.com",
+        "preview_url": "https://googleapis.com",
         "seasons": [
             {
                 "season_number": 1,
@@ -83,18 +87,32 @@ def series_detail(series_id):
         return "Series not found", 404
     return render_template('episodes.html', series=series)
 
-# Custom Download Router Engine - Forces video download on the exact same page
+# Proxy Stream Engine - Forces native in-app playing by tricking browser cors safety rules
+@app.route('/stream_proxy')
+def stream_proxy():
+    video_url = request.args.get('url')
+    if not video_url:
+        return "Missing video link parameters", 400
+        
+    headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
+    req = requests.get(video_url, stream=True, headers=headers)
+    
+    # Streams raw video bytes as if it belongs natively to ://pythonanywhere.com
+    return Response(
+        stream_with_context(req.iter_content(chunk_size=8192)),
+        content_type='video/mp4',
+        status=req.status_code
+    )
+
+# Page-level Downloader Engine 
 @app.route('/download_engine')
 def download_engine():
     target_url = request.args.get('target_url')
     file_name = request.args.get('file_name', 'video.mp4')
-    
     if not target_url:
-        return "Missing download target path link", 400
+        return "Missing file target path parameter", 400
         
-    # Python downloads file chunks in background and streams them directly into current browser tab
     req = requests.get(target_url, stream=True)
-    
     return Response(
         stream_with_context(req.iter_content(chunk_size=4096)),
         content_type='video/mp4',
