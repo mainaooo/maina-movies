@@ -11,9 +11,9 @@
         h1 { color: #e50914; margin-top: 0; margin-bottom: 5px; }
         .meta-info { color: #aaa; font-size: 14px; margin-bottom: 20px; }
         
-        /* Premium Responsive Sandbox Container */
+        /* Premium Embedded Native Player Container */
         .player-wrapper { width: 100%; margin-bottom: 30px; background-color: #000; border-radius: 6px; overflow: hidden; border: 1px solid #333; position: relative; padding-top: 56.25%; }
-        iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+        video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; display: block; }
         
         .season-title { background: #333; padding: 10px 15px; margin-top: 25px; border-radius: 4px; font-size: 18px; border-left: 4px solid #e50914; }
         .episode-list { list-style: none; padding: 0; margin: 10px 0 0 0; }
@@ -34,8 +34,11 @@
         <div class="meta-info"><strong>Genre:</strong> {{ series.genre }} | <strong>Release Year:</strong> {{ series.year }}</div>
         
         <div class="player-wrapper">
-            <!-- Sandbox frame player handles video feeds instantly without browser blocks -->
-            <iframe id="mainaPlayer" src="https://archive.org" allowfullscreen></iframe>
+            <!-- Native HTML5 video system now streams perfectly through proxy tunnel -->
+            <video id="mainaNativePlayer" controls poster="{{ series.poster }}" playsinline>
+                <source id="nativeSource" src="" type="video/mp4">
+                Your browser does not support native playback.
+            </video>
         </div>
         
         <h3>Seasons & Episodes</h3>
@@ -49,8 +52,8 @@
                         <span class="ep-title">{{ ep.title }}</span>
                     </div>
                     <div class="actions">
-                        <button class="btn btn-play" onclick="playEpisode('{{ ep.url }}')">▶ Play</button>
-                        <!-- Routes download task straight through download_engine script inside the exact same tab window -->
+                        <!-- Feeds the stream safely into proxy instead of bouncing out to archive.org -->
+                        <button class="btn btn-play" onclick="loadProxyStream('{{ ep.url }}')">▶ Play</button>
                         <a href="/download_engine?file_name={{ series.title }}_S{{ season.season_number }}E{{ ep.number }}.mp4&target_url={{ ep.url }}" class="btn btn-download">⬇ Download</a>
                     </div>
                 </li>
@@ -59,11 +62,14 @@
         {% endfor %}
     </div>
     <script>
-        function playEpisode(videoUrl) {
-            var player = document.getElementById('mainaPlayer');
-            // Formats direct links automatically into playable embedded stream layout strings
-            var embedLink = videoUrl.replace('/download/', '/embed/');
-            player.src = embedLink;
+        function loadProxyStream(rawVideoUrl) {
+            var player = document.getElementById('mainaNativePlayer');
+            var source = document.getElementById('nativeSource');
+            
+            // Forces data parsing right inside our server tunnel
+            source.src = "/stream_proxy?url=" + encodeURIComponent(rawVideoUrl);
+            player.load();
+            player.play();
             window.scrollTo({top: 0, behavior: 'smooth'});
         }
     </script>
