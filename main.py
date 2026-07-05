@@ -2,7 +2,7 @@ from flask import Flask, render_template, request
 
 app = Flask(__name__)
 
-# Upgraded database structure with verified, open video streams that bypass all browser blocks
+# Updated database structure with open player-friendly video configurations
 SERIES_DATABASE = [
     {
         "id": 1, 
@@ -14,8 +14,8 @@ SERIES_DATABASE = [
             {
                 "season_number": 1,
                 "episodes": [
-                    {"number": 1, "title": "The Awakening", "url": "https://googleapis.com"},
-                    {"number": 2, "title": "Deep Water Blackout", "url": "https://googleapis.com"}
+                    {"number": 1, "title": "The Awakening", "url": "https://vimeo.com"},
+                    {"number": 2, "title": "Deep Water Blackout", "url": "https://vimeo.com"}
                 ]
             }
         ]
@@ -30,7 +30,7 @@ SERIES_DATABASE = [
             {
                 "season_number": 1,
                 "episodes": [
-                    {"number": 1, "title": "Contact", "url": "https://googleapis.com"}
+                    {"number": 1, "title": "Contact", "url": "https://vimeo.com"}
                 ]
             }
         ]
@@ -45,7 +45,7 @@ SERIES_DATABASE = [
             {
                 "season_number": 1,
                 "episodes": [
-                    {"number": 1, "title": "Genesis (Part 1)", "url": "https://googleapis.com"}
+                    {"number": 1, "title": "Genesis (Part 1)", "url": "https://vimeo.com"}
                 ]
             }
         ]
@@ -60,7 +60,7 @@ SERIES_DATABASE = [
             {
                 "season_number": 1,
                 "episodes": [
-                    {"number": 1, "title": "The Heist", "url": "https://googleapis.com"}
+                    {"number": 1, "title": "The Heist", "url": "https://vimeo.com"}
                 ]
             }
         ]
