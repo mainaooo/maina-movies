@@ -11,9 +11,9 @@
         h1 { color: #e50914; margin-top: 0; margin-bottom: 5px; }
         .meta-info { color: #aaa; font-size: 14px; margin-bottom: 20px; }
         
-        /* Premium Responsive Player Container */
+        /* High compatibility sandbox player viewport layout */
         .player-wrapper { width: 100%; margin-bottom: 30px; background-color: #000; border-radius: 6px; overflow: hidden; border: 1px solid #333; position: relative; padding-top: 56.25%; }
-        iframe, video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; display: block; }
+        iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
         
         .season-title { background: #333; padding: 10px 15px; margin-top: 25px; border-radius: 4px; font-size: 18px; border-left: 4px solid #e50914; }
         .episode-list { list-style: none; padding: 0; margin: 10px 0 0 0; }
@@ -21,33 +21,24 @@
         .ep-details { display: flex; flex-direction: column; }
         .ep-title { font-weight: bold; color: #fff; }
         .ep-num { font-size: 12px; color: #e50914; font-weight: bold; text-transform: uppercase; margin-bottom: 2px; }
-        
         .actions { display: flex; gap: 10px; }
-        .btn { padding: 8px 16px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 13px; cursor: pointer; transition: background 0.2s; border: none; text-align: center; }
+        .btn { padding: 8px 16px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 13px; cursor: pointer; border: none; }
         .btn-play { background-color: #e50914; color: white; }
-        .btn-play:hover { background-color: #b80710; }
-        .btn-download { background-color: #008CBA; color: white; display: inline-block; line-height: 18px;}
-        .btn-download:hover { background-color: #007399; }
+        .btn-download { background-color: #008CBA; color: white; line-height: 18px; }
     </style>
 </head>
 <body>
-
     <a href="/" class="back-link">← Back to Dashboard</a>
-
     <div class="container">
         <h1>{{ series.title }}</h1>
         <div class="meta-info"><strong>Genre:</strong> {{ series.genre }} | <strong>Release Year:</strong> {{ series.year }}</div>
-
-        <!-- Safe High-Compatibility Video Stream Player Framework -->
-        <div class="player-wrapper" id="videoContainer">
-            <video id="mainaPlayer" controls poster="{{ series.poster }}">
-                <source id="videoSource" src="https://archive.org" type="video/mp4">
-                Your browser does not support the video tag.
-            </video>
-        </div>
-
-        <h3>Seasons & Episodes</h3>
         
+        <div class="player-wrapper">
+            <!-- Universal streaming frame layout -->
+            <iframe id="mainaPlayer" src="https://vimeo.com" allow="autoplay; fullscreen" allowfullscreen></iframe>
+        </div>
+        
+        <h3>Seasons & Episodes</h3>
         {% for season in series.seasons %}
             <div class="season-title">Season {{ season.season_number }}</div>
             <ul class="episode-list">
@@ -58,7 +49,6 @@
                         <span class="ep-title">{{ ep.title }}</span>
                     </div>
                     <div class="actions">
-                        <!-- Opens a secure target web stream sandbox natively -->
                         <button class="btn btn-play" onclick="playEpisode('{{ ep.url }}')">▶ Play</button>
                         <a href="{{ ep.url }}" download target="_blank" class="btn btn-download">⬇ Download</a>
                     </div>
@@ -67,21 +57,10 @@
             </ul>
         {% endfor %}
     </div>
-
     <script>
-        // High compatibility secure source routing script 
         function playEpisode(videoUrl) {
-            var container = document.getElementById('videoContainer');
-            
-            // Checks if the movie URL requires a safe iframe web-view sandbox
-            if(videoUrl.includes('archive.org') && !videoUrl.includes('format=')) {
-                // Formats public archive URLs safely into a validated stream player wrapper
-                var secureEmbedUrl = videoUrl.replace('/download/', '/details/').split('.mp4')[0];
-                container.innerHTML = '<iframe src="' + secureEmbedUrl + '&autoplay=1" allowfullscreen allow="autoplay"></iframe>';
-            } else {
-                // Defaults safely back to standard HTML5 secure streaming
-                container.innerHTML = '<video id="mainaPlayer" controls autoplay><source src="' + videoUrl + '" type="video/mp4"></video>';
-            }
+            var player = document.getElementById('mainaPlayer');
+            player.src = videoUrl + "?autoplay=1";
             window.scrollTo({top: 0, behavior: 'smooth'});
         }
     </script>
