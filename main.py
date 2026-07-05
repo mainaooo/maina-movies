@@ -1,8 +1,8 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, Response, stream_with_context
+import requests
 
 app = Flask(__name__)
 
-# Updated database structure with open player-friendly video configurations
 SERIES_DATABASE = [
     {
         "id": 1, 
@@ -14,8 +14,8 @@ SERIES_DATABASE = [
             {
                 "season_number": 1,
                 "episodes": [
-                    {"number": 1, "title": "The Awakening", "url": "https://vimeo.com"},
-                    {"number": 2, "title": "Deep Water Blackout", "url": "https://vimeo.com"}
+                    {"number": 1, "title": "The Awakening", "url": "https://archive.org"},
+                    {"number": 2, "title": "Deep Water Blackout", "url": "https://archive.org"}
                 ]
             }
         ]
@@ -30,7 +30,7 @@ SERIES_DATABASE = [
             {
                 "season_number": 1,
                 "episodes": [
-                    {"number": 1, "title": "Contact", "url": "https://vimeo.com"}
+                    {"number": 1, "title": "Contact", "url": "https://archive.org"}
                 ]
             }
         ]
@@ -45,7 +45,7 @@ SERIES_DATABASE = [
             {
                 "season_number": 1,
                 "episodes": [
-                    {"number": 1, "title": "Genesis (Part 1)", "url": "https://vimeo.com"}
+                    {"number": 1, "title": "Genesis (Part 1)", "url": "https://archive.org"}
                 ]
             }
         ]
@@ -60,7 +60,7 @@ SERIES_DATABASE = [
             {
                 "season_number": 1,
                 "episodes": [
-                    {"number": 1, "title": "The Heist", "url": "https://vimeo.com"}
+                    {"number": 1, "title": "The Heist", "url": "https://archive.org"}
                 ]
             }
         ]
@@ -82,3 +82,21 @@ def series_detail(series_id):
     if not series:
         return "Series not found", 404
     return render_template('episodes.html', series=series)
+
+# Custom Download Router Engine - Forces video download on the exact same page
+@app.route('/download_engine')
+def download_engine():
+    target_url = request.args.get('target_url')
+    file_name = request.args.get('file_name', 'video.mp4')
+    
+    if not target_url:
+        return "Missing download target path link", 400
+        
+    # Python downloads file chunks in background and streams them directly into current browser tab
+    req = requests.get(target_url, stream=True)
+    
+    return Response(
+        stream_with_context(req.iter_content(chunk_size=4096)),
+        content_type='video/mp4',
+        headers={"Content-Disposition": f"attachment; filename={file_name}"}
+    )
